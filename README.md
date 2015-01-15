@@ -1,8 +1,9 @@
 # deps.js
 Load javascript file and its dependencies.
+
 In browser extensions, the content script shares the dom with scripts in the page but not javascript execution environment. The content script execution environment is isolated.
 
-We want to load scripts to the page(not content script environment), but some of the scripts have dependencies with scripts from browser extension which cause other dependancy loader not working. So we create this for content script.
+We want to load scripts to the page(not content script environment), but some of the scripts have dependencies with scripts from browser extension which cause other dependancy loaders not working. So we create this for content script to load scripts with their dependencies.
 
 Inspired by require.js
 
