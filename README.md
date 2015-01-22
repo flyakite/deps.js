@@ -21,13 +21,19 @@ deps.config({
     'app': chrome.extension.getURL('app.js')
   },
   shim: {
+    'jquery': {
+      'waitSeconds': 3,
+      'retry': 2
+    },
     'dashboard':{
       'deps': ['react', 'jquery']
     },
     'main':{
       'deps': ['jsapi', 'jquery', 'gmail', 'dashboard']
     }
-  }
+  },
+  'waitSeconds': 10, //seconds to wait for each script or timeout, optional, default 7
+  'retry': 2  //retry times for each script, optional, default 0
 });
 
 //load script

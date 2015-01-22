@@ -13,13 +13,19 @@
         'main': 'main.js'
       },
       shim: {
+        'jquery': {
+          'waitSeconds': 3,
+          'retry': 1
+        },
         'backbone':{
-          'deps': ['underscore']
+          'deps': ['underscore'],
         },
         'main':{
-          'deps': ['jquery', 'backbone']
+          'deps': ['jquery', 'backbone'],
         }
-      }
+      },
+      'waitSeconds': 10,
+      'retry': 2
     });
     deps.load(['main','jquery']);
   </script>

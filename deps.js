@@ -7,6 +7,27 @@ var deps = (function() {
   var init = false;
   var loaded = [];
   var loading = [];
+  var waitSeconds;
+  var retry = {}, maxRetry;
+  var retryConnectionRegistry = {};
+
+  var retryConnection = {
+    hold: function(registerID, timeout, callback) {
+      var timeout = timeout * 1000;
+      var control = setTimeout(function() {
+        retryConnectionRegistry[registerID] = {};
+        callback();
+      }, timeout);
+      retryConnectionRegistry[registerID] = { 'timeout': timeout,
+                          'control': control};
+    },
+    release: function(registerID) {
+      if (retryConnectionRegistry[registerID]){
+        clearTimeout(retryConnectionRegistry[registerID].control);
+      }
+      retryConnectionRegistry[registerID] = {};  
+    }
+  };
 
   var loadScript = function(src, callback) {
     var s = document.createElement('script');
@@ -17,6 +38,9 @@ var deps = (function() {
 
   var loadScriptAndSetLoaded = function(key) {
     //console.log('loadScriptAndSetLoaded '+key);
+    if(!paths.hasOwnProperty(key)){
+      throw key + ' not in config paths.';
+    }
     if(loading.indexOf(key) != -1){
       //console.log('already loading '+key);
       return;
@@ -25,14 +49,32 @@ var deps = (function() {
     }
 
     if(loaded.indexOf(key) != -1){
+
       //console.log('already loaded '+key);
       return;
+
     }else{
+
       //console.log(key + '  loading...');
-      loadScript(paths[key], function() {
-        loaded.push(key);
-        //console.log(key + '  loaded');
-      });  
+      var performLoadScript = function() {
+        //console.log('performLoadScript: ' + key)
+        loadScript(paths[key], function() {
+          loaded.push(key);
+          //console.log(key + '  loaded');
+          retryConnection.release(key);
+        });  
+      };
+
+      var timeout = shim[key] && shim[key].waitSeconds || waitSeconds;
+      retry[key] = shim[key] && shim[key].retry || maxRetry;
+      retry[key] = parseInt(retry[key], 10);
+      retryConnection.hold(key, timeout, function() {
+        if(retry[key] > 0){
+          performLoadScript();
+          retry[key]--;
+        }
+      });
+      performLoadScript();
     }
   };
 
@@ -66,7 +108,7 @@ var deps = (function() {
   var recursivelyLoadDeps = function(key) {
     //console.log('check '+ key);
     var deps;
-    if(shim.hasOwnProperty(key)){
+    if(shim.hasOwnProperty(key) && shim[key].deps){
       deps = shim[key].deps;
       checkAndloadDeps(deps);
       waitForDepsLoadedAndLoad(key);
@@ -84,15 +126,17 @@ var deps = (function() {
     config = d._config;
     paths = config.paths;
     shim = config.shim;
+    waitSeconds = config.waitSeconds || 7;
+    maxRetry = config.retry || 0;
     //console.log(scriptKeyOrKeys);
     scriptsToLoad = typeof scriptKeyOrKeys == 'string' ? [scriptKeyOrKeys]:scriptKeyOrKeys;
     if(config && Object.keys(config).length == 0 || (paths && Object.keys(paths).length == 0)){
-      throw 'Error: no config';
+      throw 'No config.';
     }
     //console.log(scriptsToLoad);
     for(var i = scriptsToLoad.length; i--;){
       if(!paths.hasOwnProperty(scriptsToLoad[i])){
-        throw 'Error: '+key+' no in config';
+        throw key+' no in config.';
       }
       recursivelyLoadDeps(scriptsToLoad[i]);
     }
