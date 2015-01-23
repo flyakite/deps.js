@@ -19,13 +19,18 @@
         },
         'backbone':{
           'deps': ['underscore'],
+          'retry': 1
         },
         'main':{
           'deps': ['jquery', 'backbone'],
         }
       },
-      'waitSeconds': 10,
-      'retry': 2
+      waitSeconds: 10,
+      retry: 2,
+      css: {
+        'bootstrap': 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css',
+        'style': 'style.css'
+      }
     });
     deps.load(['main','jquery']);
   </script>

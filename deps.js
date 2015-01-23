@@ -3,6 +3,7 @@ var deps = (function() {
 
   var d = {};
   var shim, paths, config = {};
+  var css = {};
   var scriptsToLoad = [];
   var init = false;
   var loaded = [];
@@ -27,6 +28,14 @@ var deps = (function() {
       }
       retryConnectionRegistry[registerID] = {};  
     }
+  };
+
+  var loadStyle = function() {
+    var style = document.createElement("style");
+    for(var k in css){
+      style.innerHTML += "@import url('"+ css[k] +"');";
+    }
+    document.head.appendChild(style);
   };
 
   var loadScript = function(src, callback) {
@@ -126,8 +135,10 @@ var deps = (function() {
     config = d._config;
     paths = config.paths;
     shim = config.shim;
+    css = config.css;
     waitSeconds = config.waitSeconds || 7;
     maxRetry = config.retry || 0;
+    loadStyle();
     //console.log(scriptKeyOrKeys);
     scriptsToLoad = typeof scriptKeyOrKeys == 'string' ? [scriptKeyOrKeys]:scriptKeyOrKeys;
     if(config && Object.keys(config).length == 0 || (paths && Object.keys(paths).length == 0)){

@@ -1,5 +1,5 @@
 # deps.js
-Load javascript file and its dependencies.
+Load javascript and its dependencies for content script.
 
 In browser extensions, the content script shares the dom with scripts in the page but not javascript execution environment. The content script execution environment is isolated.
 
@@ -23,17 +23,22 @@ deps.config({
   shim: {
     'jquery': {
       'waitSeconds': 3,
-      'retry': 2
+      'retry': 1
     },
     'dashboard':{
-      'deps': ['react', 'jquery']
+      'deps': ['react', 'jquery'],
+      'retry': 1
     },
     'main':{
       'deps': ['jsapi', 'jquery', 'gmail', 'dashboard']
     }
   },
-  'waitSeconds': 10, //seconds to wait for each script or timeout, optional, default 7
-  'retry': 2  //retry times for each script, optional, default 0
+  waitSeconds: 10, //seconds to wait for each script or timeout, optional, default 7
+  retry: 2,  //retry times for each script, optional, default 0
+  css:{
+    'bootstrap': 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css',
+    'style': 'style.css'
+  }
 });
 
 //load script
