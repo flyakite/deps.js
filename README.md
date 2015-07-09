@@ -1,9 +1,9 @@
 # deps.js
-Load javascript and its dependencies for content script.
+Load JavaScript and its dependencies for content script.
 
-In browser extensions, the content script shares the dom with scripts in the page but not javascript execution environment. The content script execution environment is isolated.
+In browser extension world, the content script did not execution environment with the JavaScript in the page. What if I need to read a global variable in the page?
 
-We want to load scripts to the page(not content script environment), but some of the scripts have dependencies with scripts from browser extension which cause other dependancy loaders not working. So we create this for content script to load scripts with their dependencies.
+We want to put our content scripts to the page, but some of the scripts have dependencies with scripts from browser extension which cause other dependancy loaders not working. So we create this for content script to load scripts with their dependencies.
 
 Inspired by require.js
 
